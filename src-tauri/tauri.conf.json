@@ -4,6 +4,7 @@
   "version": "0.1.0",
   "identifier": "com.thegyi.md-viewer",
   "build": {
+    "beforeBuildCommand": "npm run build",
     "frontendDist": "../dist"
   },
   "app": {
