@@ -38,9 +38,9 @@ body {
 }
 
 .markdown-body {
-  max-width: 900px;
+  max-width: none;
   margin: 0 auto;
-  padding: 2rem 2.5rem 4rem;
+  padding: 2rem 3rem 4rem;
   overflow-wrap: break-word;
 }
 
