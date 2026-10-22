@@ -1,0 +1,143 @@
+@import 'katex/dist/katex.min.css';
+@import 'highlight.js/styles/github.css';
+@import 'highlight.js/styles/github-dark.css' (prefers-color-scheme: dark);
+
+:root {
+  color-scheme: light dark;
+  --fg: #1f2328;
+  --bg: #ffffff;
+  --muted: #59636e;
+  --border: #d1d9e0;
+  --code-bg: #eff1f3;
+  --link: #0969da;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --fg: #f0f6fc;
+    --bg: #0d1117;
+    --muted: #9198a1;
+    --border: #3d444d;
+    --code-bg: #151b23;
+    --link: #4493f8;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Noto Sans', Helvetica, Arial,
+    sans-serif;
+  font-size: 16px;
+  line-height: 1.6;
+}
+
+.markdown-body {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 2rem 2.5rem 4rem;
+  overflow-wrap: break-word;
+}
+
+.markdown-body h1,
+.markdown-body h2 {
+  padding-bottom: 0.3em;
+  border-bottom: 1px solid var(--border);
+}
+
+.markdown-body h1 {
+  font-size: 2em;
+}
+
+.markdown-body h2 {
+  font-size: 1.5em;
+}
+
+.markdown-body h3 {
+  font-size: 1.25em;
+}
+
+.markdown-body a {
+  color: var(--link);
+  text-decoration: none;
+}
+
+.markdown-body a:hover {
+  text-decoration: underline;
+}
+
+.markdown-body code {
+  font-family: ui-monospace, SFMono-Regular, 'SF Mono', Menlo, Consolas, monospace;
+  font-size: 0.9em;
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 0.2em 0.4em;
+}
+
+.markdown-body pre {
+  background: var(--code-bg);
+  border-radius: 6px;
+  padding: 1em;
+  overflow-x: auto;
+}
+
+.markdown-body pre code {
+  background: transparent;
+  padding: 0;
+  font-size: 0.85em;
+  line-height: 1.45;
+}
+
+.markdown-body blockquote {
+  margin: 0;
+  padding: 0 1em;
+  color: var(--muted);
+  border-left: 0.25em solid var(--border);
+}
+
+.markdown-body table {
+  border-collapse: collapse;
+  display: block;
+  overflow-x: auto;
+}
+
+.markdown-body th,
+.markdown-body td {
+  border: 1px solid var(--border);
+  padding: 6px 13px;
+}
+
+.markdown-body tr:nth-child(2n) {
+  background: var(--code-bg);
+}
+
+.markdown-body img {
+  max-width: 100%;
+}
+
+.markdown-body hr {
+  border: 0;
+  border-top: 1px solid var(--border);
+  margin: 1.5em 0;
+}
+
+.markdown-body .mermaid {
+  background: transparent;
+  text-align: center;
+}
+
+.markdown-body .mermaid-error {
+  color: #d1242f;
+  white-space: pre-wrap;
+}
+
+.markdown-body .placeholder {
+  color: var(--muted);
+  text-align: center;
+  margin-top: 30vh;
+}
