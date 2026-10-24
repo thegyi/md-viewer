@@ -54,6 +54,13 @@ async function render(doc) {
 
 listen('file-changed', (event) => render(event.payload));
 
+window.addEventListener('keydown', (e) => {
+  if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
+    e.preventDefault();
+    window.print();
+  }
+});
+
 listen('tauri://drag-drop', (event) => {
   const path = event.payload.paths?.[0];
   if (path) invoke('open_file', { path }).then(render);

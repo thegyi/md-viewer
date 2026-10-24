@@ -10,6 +10,7 @@ A desktop markdown viewer built with Rust + Tauri.
 - Mermaid diagrams (```` ```mermaid ```` blocks)
 - Live reload when the file changes on disk
 - Drag & drop a file onto the window to open it
+- `Ctrl+P` / `Cmd+P` to print / save as PDF
 
 ## Requirements
 

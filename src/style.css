@@ -141,3 +141,45 @@ body {
   text-align: center;
   margin-top: 30vh;
 }
+
+@media print {
+  :root {
+    --fg: #1f2328;
+    --bg: #ffffff;
+    --muted: #59636e;
+    --border: #d1d9e0;
+    --code-bg: #f6f8fa;
+    --link: #0969da;
+  }
+
+  body {
+    font-size: 12pt;
+  }
+
+  .markdown-body {
+    padding: 0;
+  }
+
+  .markdown-body pre {
+    white-space: pre-wrap;
+  }
+
+  .markdown-body pre,
+  .markdown-body table,
+  .markdown-body blockquote,
+  .markdown-body .mermaid,
+  .markdown-body .katex-display {
+    break-inside: avoid;
+  }
+
+  .markdown-body h1,
+  .markdown-body h2,
+  .markdown-body h3 {
+    break-after: avoid;
+  }
+
+  .markdown-body img,
+  .markdown-body svg {
+    max-width: 100%;
+  }
+}
