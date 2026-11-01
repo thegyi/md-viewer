@@ -146,13 +146,27 @@ body {
   padding: 1rem 0 4rem;
 }
 
-.pdf-viewer canvas {
-  display: block;
+.pdf-page {
+  position: relative;
+  width: fit-content;
   margin: 0 auto 1.25rem;
+}
+
+.pdf-page canvas {
+  display: block;
   background: #ffffff;
   box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
-  max-width: 100%;
   height: auto;
+}
+
+.pdf-link {
+  position: absolute;
+  border-radius: 2px;
+}
+
+.pdf-link:hover {
+  background: rgba(9, 105, 218, 0.15);
+  outline: 1px solid rgba(9, 105, 218, 0.4);
 }
 
 @media print {

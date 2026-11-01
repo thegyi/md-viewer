@@ -86,6 +86,28 @@ fn read_bytes(state: State<AppState>) -> Result<Vec<u8>, String> {
 }
 
 #[tauri::command]
+fn open_url(url: String) -> Result<(), String> {
+    if !url.starts_with("http://") && !url.starts_with("https://") && !url.starts_with("mailto:") {
+        return Err(format!("unsupported url scheme: {url}"));
+    }
+    let mut cmd = if cfg!(target_os = "windows") {
+        let mut c = std::process::Command::new("rundll32");
+        c.args(["url.dll,FileProtocolHandler", &url]);
+        c
+    } else if cfg!(target_os = "macos") {
+        let mut c = std::process::Command::new("open");
+        c.arg(&url);
+        c
+    } else {
+        let mut c = std::process::Command::new("xdg-open");
+        c.arg(&url);
+        c
+    };
+    cmd.spawn().map_err(|e| format!("failed to open {url}: {e}"))?;
+    Ok(())
+}
+
+#[tauri::command]
 fn open_file(app: AppHandle, state: State<AppState>, path: String) -> Option<Doc> {
     let path = PathBuf::from(&path).canonicalize().ok()?;
     if !path.is_file() {
@@ -103,7 +125,7 @@ pub fn run() {
             file: Mutex::new(None),
             watcher: Mutex::new(None),
         })
-        .invoke_handler(tauri::generate_handler![get_content, open_file, read_bytes])
+        .invoke_handler(tauri::generate_handler![get_content, open_file, read_bytes, open_url])
         .setup(|app| {
             if let Some(arg) = std::env::args().nth(1) {
                 if let Ok(path) = PathBuf::from(&arg).canonicalize() {

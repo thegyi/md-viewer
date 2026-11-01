@@ -61,7 +61,8 @@ async function renderPdf() {
     currentPdf = null;
   }
   const bytes = new Uint8Array(await invoke('read_bytes'));
-  currentPdf = await getDocument({ data: bytes }).promise;
+  const pdf = await getDocument({ data: bytes }).promise;
+  currentPdf = pdf;
 
   const viewer = document.createElement('div');
   viewer.className = 'pdf-viewer';
@@ -69,16 +70,72 @@ async function renderPdf() {
 
   const dpr = window.devicePixelRatio || 1;
   const targetWidth = Math.max(200, viewer.clientWidth);
-  for (let n = 1; n <= currentPdf.numPages; n++) {
-    const page = await currentPdf.getPage(n);
+  const pages = [];
+
+  async function scrollToDest(dest) {
+    try {
+      if (typeof dest === 'string') dest = await pdf.getDestination(dest);
+      if (!Array.isArray(dest)) return;
+      const index = typeof dest[0] === 'number' ? dest[0] : await pdf.getPageIndex(dest[0]);
+      const target = pages[index];
+      if (!target) return;
+      target.div.scrollIntoView();
+      const kind = dest[1]?.name;
+      const y = kind === 'XYZ' ? dest[3] : kind === 'FitH' || kind === 'FitBH' ? dest[2] : null;
+      if (typeof y === 'number') {
+        const [, top] = target.view.convertToViewportPoint(0, y);
+        window.scrollBy(0, top);
+      }
+    } catch {
+      // unresolved destination — ignore
+    }
+  }
+
+  for (let n = 1; n <= pdf.numPages; n++) {
+    const page = await pdf.getPage(n);
     const scale = targetWidth / page.getViewport({ scale: 1 }).width;
     const viewport = page.getViewport({ scale: scale * dpr });
+    const view = page.getViewport({ scale });
+
+    const div = document.createElement('div');
+    div.className = 'pdf-page';
     const canvas = document.createElement('canvas');
     canvas.width = Math.floor(viewport.width);
     canvas.height = Math.floor(viewport.height);
     canvas.style.width = `${Math.floor(viewport.width / dpr)}px`;
+    div.appendChild(canvas);
+    viewer.appendChild(div);
+    pages.push({ div, view });
+
     await page.render({ canvasContext: canvas.getContext('2d'), viewport }).promise;
-    viewer.appendChild(canvas);
+
+    for (const a of await page.getAnnotations()) {
+      if (a.subtype !== 'Link' || !a.rect) continue;
+      const url = a.url || a.unsafeUrl;
+      if (!url && !a.dest) continue;
+      const r = view.convertToViewportRectangle(a.rect);
+      const [x1, x2] = [Math.min(r[0], r[2]), Math.max(r[0], r[2])];
+      const [y1, y2] = [Math.min(r[1], r[3]), Math.max(r[1], r[3])];
+      const link = document.createElement('a');
+      link.className = 'pdf-link';
+      Object.assign(link.style, {
+        left: `${x1}px`,
+        top: `${y1}px`,
+        width: `${x2 - x1}px`,
+        height: `${y2 - y1}px`,
+      });
+      if (url) {
+        link.href = url;
+        link.title = url;
+      } else {
+        link.href = '#';
+        link.addEventListener('click', (e) => {
+          e.preventDefault();
+          scrollToDest(a.dest);
+        });
+      }
+      div.appendChild(link);
+    }
   }
 }
 
@@ -102,6 +159,16 @@ async function render(doc) {
     showError(e);
   }
 }
+
+contentEl.addEventListener('click', (e) => {
+  const a = e.target.closest?.('a[href]');
+  if (!a) return;
+  const url = a.getAttribute('href');
+  if (/^https?:\/\//i.test(url) || url.startsWith('mailto:')) {
+    e.preventDefault();
+    invoke('open_url', { url });
+  }
+});
 
 let reloadTimer;
 listen('file-changed', (event) => {
