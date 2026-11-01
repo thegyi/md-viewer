@@ -142,6 +142,19 @@ body {
   margin-top: 30vh;
 }
 
+.pdf-viewer {
+  padding: 1rem 0 4rem;
+}
+
+.pdf-viewer canvas {
+  display: block;
+  margin: 0 auto 1.25rem;
+  background: #ffffff;
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.25);
+  max-width: 100%;
+  height: auto;
+}
+
 @media print {
   :root {
     --fg: #1f2328;

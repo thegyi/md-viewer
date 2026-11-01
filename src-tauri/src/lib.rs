@@ -7,12 +7,22 @@ use tauri::{AppHandle, Emitter, Manager, State};
 #[derive(Serialize, Clone)]
 struct Doc {
     path: String,
-    content: String,
+    kind: String,
+    content: Option<String>,
 }
 
 fn load(path: &Path) -> Option<Doc> {
-    std::fs::read_to_string(path).ok().map(|content| Doc {
+    let is_pdf = path
+        .extension()
+        .is_some_and(|e| e.eq_ignore_ascii_case("pdf"));
+    let (kind, content) = if is_pdf {
+        path.is_file().then_some(("pdf", None))?
+    } else {
+        ("markdown", Some(std::fs::read_to_string(path).ok()?))
+    };
+    Some(Doc {
         path: path.display().to_string(),
+        kind: kind.to_string(),
         content,
     })
 }
@@ -70,6 +80,12 @@ fn get_content(state: State<AppState>) -> Option<Doc> {
 }
 
 #[tauri::command]
+fn read_bytes(state: State<AppState>) -> Result<Vec<u8>, String> {
+    let path = state.file.lock().unwrap().clone().ok_or("no file open")?;
+    std::fs::read(&path).map_err(|e| format!("failed to read {}: {e}", path.display()))
+}
+
+#[tauri::command]
 fn open_file(app: AppHandle, state: State<AppState>, path: String) -> Option<Doc> {
     let path = PathBuf::from(&path).canonicalize().ok()?;
     if !path.is_file() {
@@ -87,7 +103,7 @@ pub fn run() {
             file: Mutex::new(None),
             watcher: Mutex::new(None),
         })
-        .invoke_handler(tauri::generate_handler![get_content, open_file])
+        .invoke_handler(tauri::generate_handler![get_content, open_file, read_bytes])
         .setup(|app| {
             if let Some(arg) = std::env::args().nth(1) {
                 if let Ok(path) = PathBuf::from(&arg).canonicalize() {
