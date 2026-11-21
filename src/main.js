@@ -188,6 +188,18 @@ listen('tauri://drag-drop', (event) => {
   if (path) invoke('open_file', { path }).then(render);
 });
 
+let printTitle = null;
+window.addEventListener('beforeprint', () => {
+  printTitle = document.title;
+  document.title = 'md-viewer';
+});
+window.addEventListener('afterprint', () => {
+  if (printTitle !== null) {
+    document.title = printTitle;
+    printTitle = null;
+  }
+});
+
 window.addEventListener('keydown', (e) => {
   if ((e.ctrlKey || e.metaKey) && e.key.toLowerCase() === 'p') {
     e.preventDefault();
